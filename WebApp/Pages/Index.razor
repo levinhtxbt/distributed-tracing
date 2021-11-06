@@ -1,0 +1,21 @@
+@page "/"
+@using System.Text.Json.Serialization
+@inject IHttpClientFactory HttpClientFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Hello, </h1>
+<input type="text" class="form-control" id="username" name="username" placeholder="Enter your username">
+<br>
+<input type="button" class="btn btn-primary" id="submit" value="Submit" @onclick="Signup"/>
+
+@code {
+
+    private async Task Signup()
+    {
+        var client = HttpClientFactory.CreateClient("WebApi");
+        var response = await client.GetAsync("/signup?username=virus");
+        Console.WriteLine(response);
+    }
+
+}
