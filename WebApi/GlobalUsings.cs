@@ -1,0 +1,11 @@
+// C# 10
+global using System;
+global using GrpcService;
+global using Microsoft.AspNetCore.Builder;
+global using Microsoft.AspNetCore.Http;
+global using Microsoft.EntityFrameworkCore;
+global using Microsoft.Extensions.DependencyInjection;
+global using Microsoft.Extensions.Hosting;
+global using OpenTelemetry.Resources;
+global using OpenTelemetry.Trace;
+global using Shared.Serilog;

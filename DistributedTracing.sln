@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApp", "WebApp\WebApp.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "Shared\Shared.csproj", "{8B421270-0C3E-443A-AFF4-FD85D917F086}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GrpcService", "GrpcService\GrpcService.csproj", "{C6B5869F-7E7A-4A27-8228-A0D884FB8124}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{8B421270-0C3E-443A-AFF4-FD85D917F086}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8B421270-0C3E-443A-AFF4-FD85D917F086}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8B421270-0C3E-443A-AFF4-FD85D917F086}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C6B5869F-7E7A-4A27-8228-A0D884FB8124}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C6B5869F-7E7A-4A27-8228-A0D884FB8124}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C6B5869F-7E7A-4A27-8228-A0D884FB8124}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C6B5869F-7E7A-4A27-8228-A0D884FB8124}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
