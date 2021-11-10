@@ -25,7 +25,6 @@ builder.Services.AddOpenTelemetryTracing(builder =>
             // if we wanted to ignore some specific requests, we could use the filter
             options => options.Filter = httpContext =>
                 !httpContext.Request.Path.Value?.Contains("/_framework/aspnetcore-browser-refresh.js") ?? true)
-        
         .AddHttpClientInstrumentation( // we can hook into existing activities and customize them
             options => options.Enrich = (activity, eventName, rawObject) =>
             {
@@ -35,12 +34,6 @@ builder.Services.AddOpenTelemetryTracing(builder =>
                     activity.SetTag("RandomDemoTag", "Adding some random demo tag, just to see things working");
                 }
             })
-        // to avoid double activity, one for HttpClient, another for the gRPC client
-        // -> https://github.com/open-telemetry/opentelemetry-dotnet/blob/core-1.1.0/src/OpenTelemetry.Instrumentation.GrpcNetClient/README.md#suppressdownstreaminstrumentation
-        .AddGrpcClientInstrumentation(options => options.SuppressDownstreamInstrumentation = true)
-        // besides instrumenting EF, we also want the queries to be part of the telemetry (hence SetDbStatementForText = true)
-        .AddEntityFrameworkCoreInstrumentation(options => options.SetDbStatementForText = true)
-        //.AddSource(nameof(MessagePublisher)) // when we manually create activities, we need to setup the sources here
         .AddZipkinExporter(options =>
         {
             // not needed, it's the default

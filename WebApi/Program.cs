@@ -27,20 +27,14 @@ builder.Services.AddOpenTelemetryTracing(builder =>
         .AddAspNetCoreInstrumentation()
         .AddHttpClientInstrumentation()
         .AddMassTransitInstrumentation()
-        // to avoid double activity, one for HttpClient, another for the gRPC client
-        // -> https://github.com/open-telemetry/opentelemetry-dotnet/blob/core-1.1.0/src/OpenTelemetry.Instrumentation.GrpcNetClient/README.md#suppressdownstreaminstrumentation
         .AddGrpcClientInstrumentation(options => options.SuppressDownstreamInstrumentation = true)
-        // besides instrumenting EF, we also want the queries to be part of the telemetry (hence SetDbStatementForText = true)
         .AddEntityFrameworkCoreInstrumentation(options => options.SetDbStatementForText = true)
-        //.AddSource(nameof(MessagePublisher)) // when we manually create activities, we need to setup the sources here
         .AddZipkinExporter(options =>
         {
-            // not needed, it's the default
             options.Endpoint = new Uri("http://msi.local:9411/api/v2/spans");
         })
         .AddJaegerExporter(options =>
         {
-            // not needed, it's the default
             options.AgentHost = "msi.local";
             options.AgentPort = 6831;
         });

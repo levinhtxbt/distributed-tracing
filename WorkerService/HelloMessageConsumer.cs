@@ -37,6 +37,8 @@ public class HelloMessageConsumer : IConsumer<HelloMessage>
             activity?.SetTag("foo", 1);
             activity?.SetTag("bar", "Hello, World!");
             activity?.SetTag("baz", new int[] { 1, 2, 3 });
+            
+            await Task.Delay(TimeSpan.FromSeconds(5));
         }
         
         _logger.LogInformation("Handling message: {message}", context.Message);

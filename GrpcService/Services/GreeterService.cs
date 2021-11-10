@@ -16,7 +16,7 @@ public class GreeterService : Greeter.GreeterBase
     public override async Task<HelloReply> SayHello(HelloRequest request, ServerCallContext context)
     {
         using var activity = ActivitySource.StartActivity(nameof(SayHello));
-
+        
         // something that takes a bit
         await Task.Delay(TimeSpan.FromMilliseconds(250));
 
