@@ -1,6 +1,7 @@
 using GrpcService.Services;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using Shared.Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 // For instructions on how to configure Kestrel and gRPC clients on macOS, visit https://go.microsoft.com/fwlink/?linkid=2099682
 
 // Add services to the container.
+builder.Logging.AddSerilog(builder.Configuration, builder.Environment);
 builder.Services.AddGrpc();
 builder.Services.AddOpenTelemetryTracing(builder =>
 {

@@ -1,5 +1,5 @@
-
 using System;
+using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -15,17 +15,26 @@ builder.Logging.AddSerilog(builder.Configuration, builder.Environment);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
-builder.Services.AddHttpClient("WebApi", c =>
-{
-    c.BaseAddress = new Uri("https://localhost:5001");
-});
+builder.Services.AddHttpClient("WebApi", c => { c.BaseAddress = new Uri("https://localhost:5001"); });
 
 builder.Services.AddOpenTelemetryTracing(builder =>
 {
     builder
         .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("WebApp"))
-        .AddAspNetCoreInstrumentation()
-        .AddHttpClientInstrumentation()
+        .AddAspNetCoreInstrumentation(
+            // if we wanted to ignore some specific requests, we could use the filter
+            options => options.Filter = httpContext =>
+                !httpContext.Request.Path.Value?.Contains("/_framework/aspnetcore-browser-refresh.js") ?? true)
+        
+        .AddHttpClientInstrumentation( // we can hook into existing activities and customize them
+            options => options.Enrich = (activity, eventName, rawObject) =>
+            {
+                if (eventName == "OnStartActivity" && rawObject is System.Net.Http.HttpRequestMessage request &&
+                    request.Method == HttpMethod.Get)
+                {
+                    activity.SetTag("RandomDemoTag", "Adding some random demo tag, just to see things working");
+                }
+            })
         // to avoid double activity, one for HttpClient, another for the gRPC client
         // -> https://github.com/open-telemetry/opentelemetry-dotnet/blob/core-1.1.0/src/OpenTelemetry.Instrumentation.GrpcNetClient/README.md#suppressdownstreaminstrumentation
         .AddGrpcClientInstrumentation(options => options.SuppressDownstreamInstrumentation = true)
@@ -45,7 +54,6 @@ builder.Services.AddOpenTelemetryTracing(builder =>
         });
 });
 
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -61,7 +69,6 @@ app.UseStaticFiles();
 app.UseRouting();
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
-
 
 
 app.Run();

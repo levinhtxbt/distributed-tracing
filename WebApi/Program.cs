@@ -1,4 +1,8 @@
 
+using MassTransit;
+using Microsoft.AspNetCore.Mvc;
+using Shared;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Configure Service  
@@ -12,15 +16,17 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Logging.AddSerilog(builder.Configuration, builder.Environment);
+
 builder.Services.AddControllers();
 builder.Services.AddDbContext<UserDbContext>(opt => opt.UseSqlite("Data Source=user.db"));
+builder.Logging.AddSerilog(builder.Configuration, builder.Environment);
 builder.Services.AddOpenTelemetryTracing(builder =>
 {
     builder
         .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("WebApi"))
         .AddAspNetCoreInstrumentation()
         .AddHttpClientInstrumentation()
+        .AddMassTransitInstrumentation()
         // to avoid double activity, one for HttpClient, another for the gRPC client
         // -> https://github.com/open-telemetry/opentelemetry-dotnet/blob/core-1.1.0/src/OpenTelemetry.Instrumentation.GrpcNetClient/README.md#suppressdownstreaminstrumentation
         .AddGrpcClientInstrumentation(options => options.SuppressDownstreamInstrumentation = true)
@@ -43,6 +49,18 @@ builder.Services.AddGrpcClient<Greeter.GreeterClient>(options =>
 {
     options.Address = new Uri("http://localhost:5050");
 });
+builder.Services.AddMassTransit(c =>
+{
+    c.UsingRabbitMq((context, configurator) =>
+    {
+        configurator.Host("msi.local", "/", h =>
+        {
+            h.Username("guest");
+            h.Password("guest");
+        });
+    });
+
+});
 
 var app = builder.Build();
 
@@ -56,7 +74,11 @@ app.UseHttpsRedirection();
 app.UseRouting();
 app.UseAuthorization();
 app.MapControllers();
-app.MapGet("/signup", async (string username, UserDbContext db, Greeter.GreeterClient protoService) =>
+app.MapGet("/signup", async (
+    [FromQuery] string username, 
+    [FromServices] UserDbContext db,
+    [FromServices] Greeter.GreeterClient protoService,
+    [FromServices] IPublishEndpoint publishEndpoint ) =>
 {
     if (!string.IsNullOrEmpty(username))
     {
@@ -70,6 +92,8 @@ app.MapGet("/signup", async (string username, UserDbContext db, Greeter.GreeterC
         {
             Name = username
         });
+        
+        await publishEndpoint.Publish(new HelloMessage(greetingMessage.Message));
         
         return Results.Ok(new SignupResponse(greetingMessage.Message));
     }

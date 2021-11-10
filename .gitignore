@@ -45,5 +45,6 @@ tmplib/
 deploy/app
 /src/packages/m1cx.nvelocity
 src/packages/SS.Databases/M1Master/SQL/Migrations/tmp.sql
-wwwroot/
 *.db
+WebApi/user.db-shm
+WebApi/user.db-wal
