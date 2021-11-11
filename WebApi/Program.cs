@@ -1,7 +1,4 @@
 
-using MassTransit;
-using Microsoft.AspNetCore.Mvc;
-using Shared;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -68,6 +65,7 @@ app.UseHttpsRedirection();
 app.UseRouting();
 app.UseAuthorization();
 app.MapControllers();
+
 app.MapGet("/signup", async (
     [FromQuery] string username, 
     [FromServices] UserDbContext db,

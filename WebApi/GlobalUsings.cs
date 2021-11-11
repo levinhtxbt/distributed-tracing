@@ -9,3 +9,6 @@ global using Microsoft.Extensions.Hosting;
 global using OpenTelemetry.Resources;
 global using OpenTelemetry.Trace;
 global using Shared.Serilog;
+global using MassTransit;
+global using Microsoft.AspNetCore.Mvc;
+global using Shared;

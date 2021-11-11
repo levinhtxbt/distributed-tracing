@@ -1,21 +1,39 @@
 @page "/"
 @using System.Text.Json.Serialization
+@using System.Text.Json
 @inject IHttpClientFactory HttpClientFactory
 
 <PageTitle>Index</PageTitle>
+@if (!string.IsNullOrEmpty(message))
+{
+    <h1>@message </h1>
+}
+else
+{
+    <input type="text" class="form-control" id="username" name="username" placeholder="Enter your username" @bind="username" >
+    <br>
+    <input type="button" class="btn btn-primary" id="submit" value="Submit" @onclick="Signup"/>
+}
 
-<h1>Hello, </h1>
-<input type="text" class="form-control" id="username" name="username" placeholder="Enter your username">
-<br>
-<input type="button" class="btn btn-primary" id="submit" value="Submit" @onclick="Signup"/>
+
 
 @code {
 
+    private string message = String.Empty;
+    private string username = String.Empty;
     private async Task Signup()
     {
         var client = HttpClientFactory.CreateClient("WebApi");
-        var response = await client.GetAsync("/signup?username=virus");
-        Console.WriteLine(response);
+        var response = await client.GetAsync("/signup?username="+ username);
+
+        var content = await JsonSerializer.DeserializeAsync<HelloResponse>(
+            await response.Content.ReadAsStreamAsync(),
+            new JsonSerializerOptions {PropertyNameCaseInsensitive = true});
+
+        message = content.Message;
     }
+    
+    public record HelloResponse(string Message);
+
 
 }
